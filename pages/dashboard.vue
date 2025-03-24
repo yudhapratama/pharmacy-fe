@@ -17,19 +17,19 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <DashboardStatsCard
           title="Total Orders"
-          value="156"
+          :value="orderStats.total.toString()"
           icon="i-heroicons-shopping-cart"
           bgColor="bg-blue-500"
         />
         <DashboardStatsCard
-          title="Pending Orders"
-          value="23"
+          title="Processed Orders"
+          :value="orderStats.pending.toString()"
           icon="i-heroicons-clock"
           bgColor="bg-orange-500"
         />
         <DashboardStatsCard
           title="Completed Orders"
-          value="89"
+          :value="orderStats.completed.toString()"
           icon="i-heroicons-check-circle"
           bgColor="bg-green-500"
         />
@@ -43,13 +43,20 @@
 
       <!-- Recent Orders -->
       <DashboardRecentOrders
-        :orders="orders"
+        :orders="recentOrders"
+        :loading="loadingOrders"
       />
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '~/stores/auth'
+import { useDistributorStore } from '~/stores/distributor'
+import { useOrderStore } from '~/stores/order'
+
 definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
@@ -57,94 +64,48 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const distributorStore = useDistributorStore()
+const orderStore = useOrderStore()
 const router = useRouter()
+const loadingOrders = ref(true)
+
+// Order statistics
+const orderStats = computed(() => {
+  const orders = orderStore.orders
+  
+  return {
+    total: orders.length,
+    pending: orders.filter(order => order.status === 'published').length,
+    completed: orders.filter(order => order.status === 'completed').length
+  }
+})
 
 // Get real-time distributor count
 const distributorCount = computed(() => distributorStore.distributors.length)
 
-// Fetch distributors on mount
+// Format recent orders for display
+const recentOrders = computed(() => {
+  return orderStore.orders
+    .slice(0, 5)
+    .map(order => ({
+      id: order.orderNumber,
+      uuid: order.id, // Add the UUID for navigation
+      item: order.items && order.items.length > 0 ? order.items[0].name : 'N/A',
+      quantity: order.items && order.items.length > 0 ? `${order.items[0].quantity} ${order.items[0].unit}` : 'N/A',
+      status: order.status || 'Draft'
+    }))
+})
+
+// Fetch data on mount
 onMounted(async () => {
   try {
-    await distributorStore.fetchDistributors()
+    await Promise.all([
+      distributorStore.fetchDistributors(),
+      orderStore.fetchOrders()
+    ])
   } catch (error) {
-    console.error('Failed to fetch distributors:', error)
+    console.error('Failed to fetch data:', error)
+  } finally {
+    loadingOrders.value = false
   }
 })
-
-const currentTime = computed(() => {
-  return new Date().toLocaleString('id-ID', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-})
-
-const columns = [
-  {
-    key: 'id',
-    label: 'Order ID'
-  },
-  {
-    key: 'item',
-    label: 'Item'
-  },
-  {
-    key: 'quantity',
-    label: 'Quantity'
-  },
-  {
-    key: 'status',
-    label: 'Status'
-  }
-]
-
-const orders = [
-  {
-    id: 'PO-20230501-0001',
-    item: 'Paracetamol 500mg',
-    quantity: '1000',
-    status: 'Completed'
-  },
-  {
-    id: 'PO-20230502-0002',
-    item: 'Amoxicillin 500mg',
-    quantity: '500',
-    status: 'Processing'
-  },
-  {
-    id: 'PO-20230503-0003',
-    item: 'Vitamin C 1000mg',
-    quantity: '200',
-    status: 'Draft'
-  },
-  {
-    id: 'PO-20230504-0004',
-    item: 'Omeprazole 20mg',
-    quantity: '300',
-    status: 'Completed'
-  },
-  {
-    id: 'PO-20230505-0005',
-    item: 'Metformin 500mg',
-    quantity: '400',
-    status: 'Processing'
-  }
-]
-
-const getStatusColor = (status) => {
-  switch (status.toLowerCase()) {
-    case 'completed':
-      return 'green'
-    case 'processing':
-      return 'blue'
-    case 'draft':
-      return 'gray'
-    default:
-      return 'gray'
-  }
-}
 </script>
