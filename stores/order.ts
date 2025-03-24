@@ -94,7 +94,7 @@ export const useOrderStore = defineStore('order', {
       }
     },
 
-    // Add toast handling to the updateOrder method
+    // Update the updateOrder method to include toast handling
     async updateOrder(id: string, orderData: Partial<Order>) {
       const toast = useToast()
       this.loading = true

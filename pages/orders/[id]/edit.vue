@@ -168,7 +168,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useToast } from '@nuxt/ui'
+// Remove this direct import
+// import { useToast } from '@nuxt/ui'
 import { useOrderStore } from '~/stores/order'
 import { useDistributorStore } from '~/stores/distributor'
 
@@ -181,7 +182,7 @@ const router = useRouter()
 const route = useRoute()
 const orderStore = useOrderStore()
 const distributorStore = useDistributorStore()
-const toast = useToast()
+const toast = useToast() // This will use the auto-imported composable
 const loading = ref(true)
 const submitting = ref(false)
 const order = ref(null)
@@ -247,7 +248,7 @@ const validateForm = () => {
 }
 
 // Submit handler
-// Update the handleSubmit function to remove toast handling
+// In the script section, update the handleSubmit function
 const handleSubmit = async () => {
   if (!validateForm()) {
     toast.add({
@@ -263,7 +264,6 @@ const handleSubmit = async () => {
   submitting.value = true
   
   try {
-    // Get distributor name
     const distributor = distributorStore.distributors.find(d => d.id === form.distributorId)
     
     const orderData = {
@@ -272,18 +272,16 @@ const handleSubmit = async () => {
     }
     
     await orderStore.updateOrder(route.params.id, orderData)
-    
-    // Redirect to order details
     router.push(`/orders/${route.params.id}`)
   } catch (error) {
+    // Remove toast handling here since it's now handled in the store
     console.error('Error updating order:', error)
-    // No need to show toast here as it's handled in the store
   } finally {
     submitting.value = false
   }
 }
 
-// Fetch data
+// Also update the onMounted section to remove duplicate toast
 onMounted(async () => {
   const orderId = route.params.id
   
@@ -293,27 +291,20 @@ onMounted(async () => {
   }
   
   try {
-    // Fetch distributors if not already loaded
     if (distributorStore.distributors.length === 0) {
       await distributorStore.fetchDistributors()
     }
     
-    // Fetch order
     const fetchedOrder = await orderStore.fetchOrderById(orderId)
     order.value = fetchedOrder
     
-    // Populate form with order data
     form.distributorId = fetchedOrder.distributorId
     form.orderType = fetchedOrder.orderType
     form.orderDate = fetchedOrder.orderDate
     form.items = [...fetchedOrder.items]
   } catch (error) {
     console.error('Error fetching order:', error)
-    toast.add({
-      title: 'Error',
-      description: 'Failed to load order details',
-      color: 'red'
-    })
+    // Remove toast here as it should be handled in the store's fetchOrderById method
   } finally {
     loading.value = false
   }
