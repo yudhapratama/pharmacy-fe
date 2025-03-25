@@ -22,6 +22,7 @@ yarn-error.log*
 .env
 .env.*
 !.env.example
+ecosystem.config.js
 
 # IDE
 .idea
