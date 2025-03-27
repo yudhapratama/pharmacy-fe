@@ -63,14 +63,23 @@ export const useOrderService = () => {
       return response.data
     },
 
-    async exportOrderPdf(id: string) {
-      const response = await axios.get(`${API_URL}/orders/${id}/export`, {
-        headers: {
-          'Authorization': `Bearer ${authService.getToken()}`
-        },
-        responseType: 'blob'
-      })
-      return response.data
+    async exportOrderPdf(id: string, exportData?: any) {
+      try {
+        const response = await axios({
+          url: `${API_URL}/orders/${id}/export`,
+          method: 'POST',
+          data: exportData || {},
+          responseType: 'blob',
+          headers: {
+            'Authorization': `Bearer ${authService.getToken()}`,
+            'Accept': 'application/pdf'
+          }
+        })
+        return response.data
+      } catch (error) {
+        console.error('Error exporting order as PDF:', error)
+        throw error
+      }
     }
   }
 }

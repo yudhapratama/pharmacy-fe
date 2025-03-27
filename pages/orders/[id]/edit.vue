@@ -9,194 +9,166 @@
         </div>
         <div class="flex gap-2">
           <UButton
+            variant="outline"
             color="gray"
-            variant="solid"
-            icon="i-heroicons-arrow-left"
-            @click="router.push(`/orders/${route.params.id}`)"
+            to="/orders"
           >
-            Back to Order
+            Cancel
           </UButton>
           <UButton
-            color="blue"
-            icon="i-heroicons-check"
-            :loading="submitting"
-            @click="handleSubmit"
+            color="black"
+            :loading="loading"
+            @click="saveOrder"
           >
             Save Changes
           </UButton>
         </div>
       </div>
 
-      <!-- Loading state -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8" />
-      </div>
-
       <!-- Form -->
-      <div v-else-if="order" class="bg-white rounded-lg shadow p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <UFormGroup label="Distributor" required>
-              <USelect
-                v-model="form.distributorId"
-                :options="distributorOptions"
-                placeholder="Select a distributor"
-                :loading="distributorStore.loading"
-              />
-            </UFormGroup>
-          </div>
-          <div>
-            <UFormGroup label="Order Type" required>
-              <USelect
-                v-model="form.orderType"
-                :options="orderTypeOptions"
-                placeholder="Select order type"
-              />
-            </UFormGroup>
-          </div>
-          <div>
-            <UFormGroup label="Order Date" required>
-              <UInput
-                v-model="form.orderDate"
-                type="date"
-              />
-            </UFormGroup>
-          </div>
-        </div>
-
-        <!-- Order Items -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium">Order Items</h3>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-plus"
-              @click="addItem"
-            >
-              Add Item
-            </UButton>
-          </div>
-
-          <div v-for="(item, index) in form.items" :key="index" class="bg-gray-50 p-4 rounded-lg mb-4">
-            <div class="flex justify-between items-start mb-4">
-              <h4 class="font-medium">Item #{{ index + 1 }}</h4>
-              <UButton
-                color="red"
-                variant="ghost"
-                icon="i-heroicons-trash"
-                size="xs"
-                @click="removeItem(index)"
-              />
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <UFormGroup label="Item Name" required>
-                <UInput
-                  v-model="item.name"
-                  placeholder="Enter item name"
-                />
-              </UFormGroup>
-
-              <div class="grid grid-cols-2 gap-4">
-                <UFormGroup label="Quantity" required>
-                  <UInput
-                    v-model.number="item.quantity"
-                    type="number"
-                    min="1"
-                    placeholder="Quantity"
+      <UCard v-if="order">
+        <UForm :state="form">
+          <!-- Order Details -->
+          <div class="space-y-8">
+            <div>
+              <h2 class="text-xl font-semibold mb-4">Order Details</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <UFormGroup label="Order Number" required>
+                  <UInput v-model="form.orderNumber" placeholder="Enter order number" />
+                </UFormGroup>
+                
+                <UFormGroup label="Order Type" required>
+                  <USelect
+                    v-model="form.orderType"
+                    :options="orderTypes"
+                    option-attribute="label"
+                    value-attribute="value"
                   />
                 </UFormGroup>
-                <UFormGroup label="Unit" required>
+                
+                <UFormGroup label="Distributor" required>
+                  <USelect
+                    v-model="form.distributorId"
+                    :options="distributors"
+                    option-attribute="name"
+                    value-attribute="id"
+                    @update:model-value="updateDistributorName"
+                  />
+                </UFormGroup>
+                
+                <UFormGroup label="Order Date" required>
                   <UInput
-                    v-model="item.unit"
-                    placeholder="e.g., Box, Bottle"
+                    v-model="form.orderDate"
+                    type="date"
                   />
                 </UFormGroup>
               </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UFormGroup label="Active Ingredient">
-                <UInput
-                  v-model="item.activeIngredient"
-                  placeholder="Active ingredient"
-                />
-              </UFormGroup>
-              <UFormGroup label="Form & Strength">
-                <UInput
-                  v-model="item.formAndStrength"
-                  placeholder="e.g., Tablet 500mg"
-                />
-              </UFormGroup>
+            
+            <!-- Order Items -->
+            <div>
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Order Items</h2>
+                <UButton
+                  variant="ghost"
+                  icon="i-heroicons-plus"
+                  @click="addItem"
+                >
+                  Add Item
+                </UButton>
+              </div>
+              
+              <div v-if="form.items.length === 0" class="text-center py-8 border border-dashed rounded-lg">
+                <p class="text-gray-500">No items added yet. Click "Add Item" to start.</p>
+              </div>
+              
+              <div v-else class="space-y-4">
+                <UCard v-for="(item, index) in form.items" :key="index" class="relative">
+                  <button 
+                    type="button"
+                    class="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                    @click="removeItem(index)"
+                  >
+                    <UIcon name="i-heroicons-x-mark" class="w-5 h-5" />
+                  </button>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <UFormGroup label="Item Name" required>
+                      <UInput v-model="item.name" placeholder="Enter item name" />
+                    </UFormGroup>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                      <UFormGroup label="Quantity" required>
+                        <UInput v-model.number="item.quantity" type="number" min="1" />
+                      </UFormGroup>
+                      
+                      <UFormGroup label="Unit" required>
+                        <UInput v-model="item.unit" placeholder="e.g. Box, Bottle" />
+                      </UFormGroup>
+                    </div>
+                    
+                    <UFormGroup label="Active Ingredient">
+                      <UInput v-model="item.activeIngredient" placeholder="Enter active ingredient" />
+                    </UFormGroup>
+                    
+                    <UFormGroup label="Form & Strength">
+                      <UInput v-model="item.formAndStrength" placeholder="e.g. Tablet 500mg" />
+                    </UFormGroup>
+                    
+                    <UFormGroup label="Quantity in Words" class="md:col-span-2">
+                      <UInput v-model="item.quantityInWords" placeholder="e.g. Ten boxes" />
+                    </UFormGroup>
+                    
+                    <UFormGroup label="Notes" class="md:col-span-2">
+                      <UTextarea v-model="item.notes" placeholder="Additional notes" />
+                    </UFormGroup>
+                  </div>
+                </UCard>
+              </div>
             </div>
-
-            <UFormGroup label="Quantity in Words">
-              <UInput
-                v-model="item.quantityInWords"
-                placeholder="e.g., Ten boxes"
-              />
-            </UFormGroup>
-
-            <UFormGroup label="Notes">
-              <UTextarea
-                v-model="item.notes"
-                placeholder="Additional notes"
-                rows="2"
-              />
-            </UFormGroup>
           </div>
-
-          <div v-if="form.items.length === 0" class="text-center py-8 bg-gray-50 rounded-lg">
-            <p class="text-gray-500">No items added yet. Click "Add Item" to start.</p>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="bg-white rounded-lg shadow p-12 text-center">
-        <UIcon name="i-heroicons-exclamation-triangle" class="h-12 w-12 mx-auto text-yellow-500" />
-        <h3 class="mt-4 text-lg font-medium">Order not found</h3>
-        <p class="mt-2 text-gray-500">The order you're trying to edit doesn't exist or you don't have permission to edit it.</p>
-        <UButton class="mt-6" @click="router.push('/orders')">
-          Back to Orders
-        </UButton>
+        </UForm>
+      </UCard>
+      
+      <div v-else class="flex justify-center items-center h-64">
+        <USpinner />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-// Remove this direct import
-// import { useToast } from '@nuxt/ui'
-import { useOrderStore } from '~/stores/order'
-import { useDistributorStore } from '~/stores/distributor'
-
 definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
 })
 
-const router = useRouter()
+import { useRoute, useRouter, navigateTo } from '#app'
+import { useOrderStore } from '~/stores/order'
+import { useDistributorStore } from '~/stores/distributor'
+
 const route = useRoute()
+const router = useRouter()
 const orderStore = useOrderStore()
 const distributorStore = useDistributorStore()
-const toast = useToast() // This will use the auto-imported composable
-const loading = ref(true)
-const submitting = ref(false)
+
+const orderId = route.params.id
+const loading = ref(false)
 const order = ref(null)
 
-// Form data
-const form = reactive({
+// Form state
+const form = ref({
+  orderNumber: '',
   distributorId: '',
+  distributorName: '',
   orderType: 'regular',
-  orderDate: '',
+  status: 'draft',
+  orderDate: new Date().toISOString().split('T')[0],
   items: []
 })
 
-// Options for selects
-const orderTypeOptions = [
+// Order types
+const orderTypes = [
   { label: 'Regular', value: 'regular' },
   { label: 'OOT', value: 'oot' },
   { label: 'Prekursor', value: 'prekursor' },
@@ -204,16 +176,79 @@ const orderTypeOptions = [
   { label: 'Narkotika', value: 'narkotika' }
 ]
 
-const distributorOptions = computed(() => {
-  return distributorStore.distributors.map(distributor => ({
-    label: distributor.name,
-    value: distributor.id
-  }))
+// Fetch distributors
+const distributors = ref([])
+onMounted(async () => {
+  try {
+    distributors.value = await distributorStore.fetchDistributors()
+    await fetchOrder()
+  } catch (error) {
+    console.error('Error loading data:', error)
+  }
 })
 
-// Item management
-const addItem = () => {
-  form.items.push({
+// Fetch order data
+async function fetchOrder() {
+  try {
+    console.log('Fetching order with ID:', orderId)
+    order.value = await orderStore.fetchOrderById(orderId)
+    console.log('Fetched order:', order.value)
+    
+    // Only allow editing draft orders
+    if (order.value.status !== 'draft') {
+      console.log('Order is not in draft status, redirecting')
+      useToast().add({
+        title: 'Cannot Edit',
+        description: 'Only draft orders can be edited',
+        color: 'orange'
+      })
+      router.push(`/orders/${orderId}`)
+      return
+    }
+    
+    console.log('Order is in draft status, populating form')
+    // Populate form with order data
+    form.value = {
+      orderNumber: order.value.orderNumber,
+      distributorId: order.value.distributorId,
+      distributorName: order.value.distributorName,
+      orderType: order.value.orderType,
+      status: order.value.status,
+      orderDate: order.value.orderDate.split('T')[0],
+      items: order.value.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        activeIngredient: item.activeIngredient || '',
+        formAndStrength: item.formAndStrength || '',
+        quantityInWords: item.quantityInWords || '',
+        notes: item.notes || ''
+      }))
+    }
+    console.log('Form populated:', form.value)
+  } catch (error) {
+    console.error('Error fetching order:', error)
+    useToast().add({
+      title: 'Error',
+      description: 'Failed to load order data',
+      color: 'red'
+    })
+    router.push('/orders')
+  }
+}
+
+// Update distributor name when distributor is selected
+function updateDistributorName() {
+  const selectedDistributor = distributors.value.find(d => d.id === form.value.distributorId)
+  if (selectedDistributor) {
+    form.value.distributorName = selectedDistributor.name
+  }
+}
+
+// Add new item
+function addItem() {
+  form.value.items.push({
     name: '',
     quantity: 1,
     unit: '',
@@ -224,89 +259,58 @@ const addItem = () => {
   })
 }
 
-const removeItem = (index) => {
-  form.items.splice(index, 1)
+// Remove item
+function removeItem(index) {
+  form.value.items.splice(index, 1)
 }
 
-// Form validation
-const validateForm = () => {
-  if (!form.distributorId || !form.orderType || !form.orderDate) {
-    return false
-  }
-
-  if (form.items.length === 0) {
-    return false
-  }
-
-  for (const item of form.items) {
-    if (!item.name || !item.quantity || !item.unit) {
-      return false
+// Save order
+async function saveOrder() {
+  loading.value = true
+  try {
+    // Validate form
+    if (!form.value.orderNumber || !form.value.distributorId || !form.value.orderDate || form.value.items.length === 0) {
+      useToast().add({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields and add at least one item',
+        color: 'red'
+      })
+      loading.value = false
+      return
     }
-  }
-
-  return true
-}
-
-// Submit handler
-// In the script section, update the handleSubmit function
-const handleSubmit = async () => {
-  if (!validateForm()) {
-    toast.add({
-      id: 'validation-error',
-      title: 'Validation Error',
-      description: 'Please fill in all required fields',
-      color: 'red',
-      timeout: 5000
+    
+    // Validate items
+    for (const item of form.value.items) {
+      if (!item.name || !item.quantity || !item.unit) {
+        useToast().add({
+          title: 'Validation Error',
+          description: 'Please fill in all required item fields',
+          color: 'red'
+        })
+        loading.value = false
+        return
+      }
+    }
+    
+    // Update order
+    await orderStore.updateOrder(orderId, form.value)
+    
+    useToast().add({
+      title: 'Success',
+      description: 'Order updated successfully',
+      color: 'green'
     })
-    return
-  }
-  
-  submitting.value = true
-  
-  try {
-    const distributor = distributorStore.distributors.find(d => d.id === form.distributorId)
     
-    const orderData = {
-      ...form,
-      distributorName: distributor?.name
-    }
-    
-    await orderStore.updateOrder(route.params.id, orderData)
-    router.push(`/orders/${route.params.id}`)
+    router.push(`/orders/${orderId}`)
   } catch (error) {
-    // Remove toast handling here since it's now handled in the store
     console.error('Error updating order:', error)
-  } finally {
-    submitting.value = false
-  }
-}
-
-// Also update the onMounted section to remove duplicate toast
-onMounted(async () => {
-  const orderId = route.params.id
-  
-  if (!orderId) {
-    router.push('/orders')
-    return
-  }
-  
-  try {
-    if (distributorStore.distributors.length === 0) {
-      await distributorStore.fetchDistributors()
-    }
-    
-    const fetchedOrder = await orderStore.fetchOrderById(orderId)
-    order.value = fetchedOrder
-    
-    form.distributorId = fetchedOrder.distributorId
-    form.orderType = fetchedOrder.orderType
-    form.orderDate = fetchedOrder.orderDate
-    form.items = [...fetchedOrder.items]
-  } catch (error) {
-    console.error('Error fetching order:', error)
-    // Remove toast here as it should be handled in the store's fetchOrderById method
+    useToast().add({
+      title: 'Error',
+      description: 'Failed to update order',
+      color: 'red'
+    })
   } finally {
     loading.value = false
   }
-})
+}
 </script>

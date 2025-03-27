@@ -7,6 +7,7 @@
           <h1 class="text-2xl font-semibold">Order Details</h1>
           <p class="text-gray-500">{{ order?.orderNumber }}</p>
         </div>
+        <!-- In the header section of your details page -->
         <div class="flex gap-2">
           <UButton
             color="gray"
@@ -16,6 +17,7 @@
           >
             Back to Orders
           </UButton>
+          <!-- Edit button removed -->
           <UButton
             v-if="order?.status === 'draft'"
             color="blue"
@@ -97,33 +99,118 @@
 
         <!-- Order Items -->
         <div class="p-6">
-          <h3 class="text-lg font-medium mb-4">Order Items</h3>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Order Items</h3>
+            <UButton 
+              v-if="order.status === 'draft'"
+              size="sm" 
+              icon="i-heroicons-plus" 
+              @click="addNewItem"
+            >
+              Add Item
+            </UButton>
+          </div>
           
-          <UTable :columns="itemColumns" :rows="order.items">
-            <template #name-data="{ row }">
+          <div v-for="(item, index) in order.items" :key="index" class="mb-4 border rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
               <div>
-                <p class="font-medium">{{ row.name }}</p>
-                <p v-if="row.activeIngredient" class="text-sm text-gray-500">
-                  Active: {{ row.activeIngredient }}
+                <p class="font-medium">{{ item.name }}</p>
+                <p v-if="item.activeIngredient" class="text-sm text-gray-500">
+                  Active: {{ item.activeIngredient }}
                 </p>
-                <p v-if="row.formAndStrength" class="text-sm text-gray-500">
-                  Form: {{ row.formAndStrength }}
+                <p v-if="item.formAndStrength" class="text-sm text-gray-500">
+                  Form: {{ item.formAndStrength }}
                 </p>
               </div>
-            </template>
+              <div class="flex gap-2" v-if="order.status === 'draft'">
+                <UButton 
+                  v-if="!item.editing" 
+                  size="xs" 
+                  variant="ghost" 
+                  icon="i-heroicons-pencil" 
+                  @click="startEditing(item)"
+                />
+                <UButton 
+                  v-if="item.editing" 
+                  size="xs" 
+                  variant="ghost" 
+                  color="green" 
+                  icon="i-heroicons-check" 
+                  @click="saveItem(item)"
+                />
+                <UButton 
+                  v-if="item.editing" 
+                  size="xs" 
+                  variant="ghost" 
+                  color="gray" 
+                  icon="i-heroicons-x-mark" 
+                  @click="cancelEditing(item)"
+                />
+                <UButton 
+                  size="xs" 
+                  variant="ghost" 
+                  color="red" 
+                  icon="i-heroicons-trash" 
+                  @click="removeItem(index)"
+                />
+              </div>
+            </div>
             
-            <template #quantity-data="{ row }">
-              {{ row.quantity }} {{ row.unit }}
-              <p v-if="row.quantityInWords" class="text-sm text-gray-500">
-                {{ row.quantityInWords }}
-              </p>
-            </template>
+            <div v-if="!item.editing">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <div>
+                  <p class="text-sm text-gray-500">Quantity:</p>
+                  <p>{{ item.quantity }} {{ item.unit }}</p>
+                  <p v-if="item.quantityInWords" class="text-sm text-gray-500">
+                    {{ item.quantityInWords }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Notes:</p>
+                  <p v-if="item.notes">{{ item.notes }}</p>
+                  <p v-else class="text-gray-400">-</p>
+                </div>
+              </div>
+            </div>
             
-            <template #notes-data="{ row }">
-              <p v-if="row.notes" class="text-sm">{{ row.notes }}</p>
-              <p v-else class="text-sm text-gray-400">-</p>
-            </template>
-          </UTable>
+            <div v-else class="mt-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <UFormGroup label="Item Name" required>
+                  <UInput v-model="item.name" placeholder="Enter item name" />
+                </UFormGroup>
+                
+                <div class="grid grid-cols-2 gap-2">
+                  <UFormGroup label="Quantity" required>
+                    <UInput v-model.number="item.quantity" type="number" min="1" />
+                  </UFormGroup>
+                  
+                  <UFormGroup label="Unit" required>
+                    <UInput v-model="item.unit" placeholder="e.g. Box, Bottle" />
+                  </UFormGroup>
+                </div>
+                
+                <UFormGroup label="Active Ingredient">
+                  <UInput v-model="item.activeIngredient" placeholder="Enter active ingredient" />
+                </UFormGroup>
+                
+                <UFormGroup label="Form & Strength">
+                  <UInput v-model="item.formAndStrength" placeholder="e.g. Tablet 500mg" />
+                </UFormGroup>
+                
+                <UFormGroup label="Quantity in Words" class="md:col-span-2">
+                  <UInput v-model="item.quantityInWords" placeholder="e.g. Ten boxes" />
+                </UFormGroup>
+                
+                <UFormGroup label="Notes" class="md:col-span-2">
+                  <UTextarea v-model="item.notes" placeholder="Additional notes" />
+                </UFormGroup>
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="order.items.length === 0" class="text-center py-8 border border-dashed rounded-lg">
+            <p class="text-gray-500">No items added yet.</p>
+          </div>
         </div>
       </div>
 
@@ -144,6 +231,9 @@ definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
 })
+
+import { useOrderService } from '~/services/order.service'
+import { useProfileStore } from '~/stores/profile'
 
 const router = useRouter()
 const route = useRoute()
@@ -274,8 +364,38 @@ const handleDelete = async () => {
 
 const handleExport = async () => {
   try {
+
     const orderService = useOrderService()
-    const blob = await orderService.exportOrderPdf(order.value.id)
+    const profileStore = useProfileStore()
+    
+    // Initialize profile from auth data if needed - similar to pharmacy.vue
+    if (!profileStore.profile) {
+      profileStore.initFromAuth()
+    }
+    
+    // Get pharmacy profile data from the store
+    const pharmacyProfile = profileStore.profile || {
+      pharmacyName: 'Trial',
+      address: 'Default Address',
+      picName: 'Pharmacist',
+      picLicenseNumber: '000000',
+      siaNumber: '000000'
+    }
+    
+    // Map profile data to the format expected by the PDF generator
+    const exportData = {
+      order: order.value,
+      pharmacy: {
+        pharmacyName: pharmacyProfile.pharmacyName,
+        address: pharmacyProfile.pharmacyAddress,
+        picName: pharmacyProfile.pharmacistName || pharmacyProfile.picName,
+        picLicenseNumber: pharmacyProfile.sipa,
+        siaNumber: pharmacyProfile.sia
+      },
+      exportDate: new Date().toISOString()
+    }
+    
+    const blob = await orderService.exportOrderPdf(order.value.id, exportData)
     
     // Create a URL for the blob
     const url = window.URL.createObjectURL(blob)
@@ -283,7 +403,7 @@ const handleExport = async () => {
     // Create a link element
     const link = document.createElement('a')
     link.href = url
-    link.download = `order-${order.value.orderNumber}.pdf`
+    link.download = `surat-pesanan-${order.value.orderNumber}.pdf`
     
     // Append to the document and trigger the download
     document.body.appendChild(link)
@@ -292,6 +412,12 @@ const handleExport = async () => {
     // Clean up
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+    
+    toast.add({
+      title: 'Export Success',
+      description: 'Order has been exported as PDF',
+      color: 'green'
+    })
   } catch (error) {
     console.error('Error exporting order:', error)
     toast.add({
@@ -325,4 +451,107 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const handleEdit = () => {
+  console.log('Edit button clicked, navigating to:', `/orders/${order.value.id}/edit`)
+  // Use navigateTo instead of router.push for more reliable navigation
+  navigateTo(`/orders/${order.value.id}/edit`)
+}
+
+// Add these functions for inline editing
+function startEditing(item) {
+  // Save original values in case user cancels
+  item._original = JSON.parse(JSON.stringify(item));
+  item.editing = true;
+}
+
+function cancelEditing(item) {
+  // Restore original values
+  Object.keys(item._original).forEach(key => {
+    if (key !== '_original' && key !== 'editing') {
+      item[key] = item._original[key];
+    }
+  });
+  delete item._original;
+  item.editing = false;
+}
+
+async function saveItem(item) {
+  try {
+    // Validate item
+    if (!item.name || !item.quantity || !item.unit) {
+      toast.add({
+        title: 'Validation Error',
+        description: 'Please fill in all required item fields',
+        color: 'red'
+      });
+      return;
+    }
+    
+    // Remove temporary properties
+    delete item._original;
+    item.editing = false;
+    
+    // Update the order with the modified items
+    await orderStore.updateOrder(order.value.id, {
+      ...order.value,
+      items: order.value.items
+    });
+    
+    toast.add({
+      title: 'Success',
+      description: 'Item updated successfully',
+      color: 'green'
+    });
+  } catch (error) {
+    console.error('Error updating item:', error);
+    toast.add({
+      title: 'Error',
+      description: 'Failed to update item',
+      color: 'red'
+    });
+  }
+}
+
+async function removeItem(index) {
+  if (confirm('Are you sure you want to remove this item?')) {
+    try {
+      order.value.items.splice(index, 1);
+      
+      // Update the order with the modified items
+      await orderStore.updateOrder(order.value.id, {
+        ...order.value,
+        items: order.value.items
+      });
+      
+      toast.add({
+        title: 'Success',
+        description: 'Item removed successfully',
+        color: 'green'
+      });
+    } catch (error) {
+      console.error('Error removing item:', error);
+      toast.add({
+        title: 'Error',
+        description: 'Failed to remove item',
+        color: 'red'
+      });
+    }
+  }
+}
+
+function addNewItem() {
+  const newItem = {
+    name: '',
+    quantity: 1,
+    unit: '',
+    activeIngredient: '',
+    formAndStrength: '',
+    quantityInWords: '',
+    notes: '',
+    editing: true
+  };
+  
+  order.value.items.push(newItem);
+}
 </script>

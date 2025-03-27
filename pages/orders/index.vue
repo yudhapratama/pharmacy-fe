@@ -241,6 +241,7 @@ const handleView = (row) => {
 
 const handleEdit = (row) => {
   if (row.status === 'draft') {
+    console.log('Navigating to edit page:', `/orders/${row.id}/edit`)    
     router.push(`/orders/${row.id}/edit`)
   } else {
     const toast = useToast()
@@ -268,36 +269,7 @@ onMounted(async () => {
   }
 })
 
-const handleExport = async (row) => {
-  try {
-    const orderService = useOrderService()
-    const blob = await orderService.exportOrderPdf(row.id)
-    
-    // Create a URL for the blob
-    const url = window.URL.createObjectURL(blob)
-    
-    // Create a link element
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `order-${row.orderNumber}.pdf`
-    
-    // Append to the document and trigger the download
-    document.body.appendChild(link)
-    link.click()
-    
-    // Clean up
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Error exporting order:', error)
-    const toast = useToast()
-    toast.add({
-      title: 'Export Failed',
-      description: 'Failed to export order as PDF',
-      color: 'red'
-    })
-  }
-}
+// handleExport function removed
 
 const handleComplete = async (row) => {
   if (row.status === 'published') {
@@ -323,12 +295,8 @@ const getActionItems = (row) => {
         label: 'View Details',
         icon: 'i-heroicons-eye',
         click: () => handleView(row)
-      },
-      {
-        label: 'Export PDF',
-        icon: 'i-heroicons-document-arrow-down',
-        click: () => handleExport(row)
       }
+      // Export PDF option removed
     ]
   ]
   
