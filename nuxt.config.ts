@@ -10,12 +10,33 @@ export default defineNuxtConfig({
 
   ui: {
     global: true,
-    icons: ['heroicons']
+    icons: ['heroicons'],
+    // Add theme configuration to force light mode
+    preferences: {
+      theme: {
+        dark: false,
+        system: false
+      }
+    }
+  },
+
+  // Add or update the colorMode configuration
+  colorMode: {
+    classSuffix: '',
+    preference: 'light',
+    fallback: 'light',
+    storageKey: 'nuxt-color-mode',
+    disableTransition: true
   },
 
   tailwindcss: {
     exposeConfig: true,
-    viewer: true
+    viewer: true,
+    config: {
+      theme: {
+        darkMode: false
+      },
+    }    
   },
 
   app: {

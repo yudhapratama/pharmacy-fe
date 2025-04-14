@@ -1,7 +1,8 @@
 import type { Config } from 'tailwindcss'
 
 export default {
-  darkMode: ['class'],
+  // This should be 'media' to override system preferences
+  darkMode: 'class', // Changed to 'class' which requires explicit dark class addition
   content: [
     './components/**/*.{js,vue,ts}',
     './layouts/**/*.vue',
