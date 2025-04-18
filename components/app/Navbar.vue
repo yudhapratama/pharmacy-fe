@@ -56,6 +56,8 @@
 </template>
 
 <script setup>
+import { translations } from '~/utils/translations'
+
 const route = useRoute()
 const authStore = useAuthStore()
 const router = useRouter()
@@ -71,17 +73,17 @@ const isActiveRoute = (path) => {
 // Navigation items
 const navItems = [
   {
-    label: 'Dashboard',
+    label: translations.dashboard,
     path: '/dashboard',
     icon: 'i-heroicons-squares-2x2'
   },
   {
-    label: 'Distributors',
+    label: translations.distributors,
     path: '/distributors',
     icon: 'i-heroicons-building-storefront'
   },
   {
-    label: 'Orders',
+    label: translations.orders,
     path: '/orders',
     icon: 'i-heroicons-clipboard-document-list'
   }
@@ -92,20 +94,20 @@ const navItems = [
 const profileMenuItems = computed(() => [
   [
     {
-      label: 'Pharmacy Profile',
+      label: translations.profile,
       icon: 'i-heroicons-building-office-2',
       description: authStore.user?.pharmacy_name,
       to: '/profile/pharmacy'
     },
     {
-      label: 'Account Settings',
+      label: translations.settings,
       icon: 'i-heroicons-cog-6-tooth',
       to: '/profile/account'
     }
   ],
   [
     {
-      label: 'Sign Out',
+      label: translations.logout,
       icon: 'i-heroicons-arrow-right-on-rectangle',
       click: () => {  // Change from onClick to click
         console.log('Sign out clicked')
