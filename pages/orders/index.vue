@@ -3,13 +3,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-semibold">Orders</h1>
+        <h1 class="text-2xl font-semibold">{{ translations.orders }}</h1>
         <UButton
           color="black"
           icon="i-heroicons-plus"
           @click="router.push('/orders/create')"
         >
-          Create Order
+          {{ translations.createOrder }}
         </UButton>
       </div>
 
@@ -17,33 +17,33 @@
       <div class="bg-white rounded-lg shadow p-4 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Search -->
-          <UFormGroup label="Search Order ID">
+          <UFormGroup :label="translations.searchOrderID">
             <UInput
               v-model="filters.search"
-              placeholder="Enter order ID"
+              :placeholder="translations.enterOrderID"
               icon="i-heroicons-magnifying-glass"
               @keyup.enter="applyFilters"
             />
           </UFormGroup>
 
           <!-- Status Filter -->
-          <UFormGroup label="Status">
+          <UFormGroup :label="translations.status">
             <USelect
               v-model="filters.status"
               :options="statusOptions"
-              placeholder="Select status"
+              :placeholder="translations.selectStatus"
             />
           </UFormGroup>
 
           <!-- Date Range -->
-          <UFormGroup label="Start Date">
+          <UFormGroup :label="translations.startDate">
             <UInput
               v-model="filters.startDate"
               type="date"
             />
           </UFormGroup>
 
-          <UFormGroup label="End Date">
+          <UFormGroup :label="translations.endDate">
             <UInput
               v-model="filters.endDate"
               type="date"
@@ -58,13 +58,13 @@
             class="mr-2"
             @click="resetFilters"
           >
-            Reset
+            {{ translations.reset }}
           </UButton>
           <UButton
             color="black"
             @click="applyFilters"
           >
-            Apply Filters
+            {{ translations.apply }}
           </UButton>
         </div>
       </div>
@@ -102,6 +102,8 @@
 </template>
 
 <script setup>
+import { translations } from '~/utils/translations'
+
 definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
@@ -120,32 +122,32 @@ const filters = ref({
 })
 
 const statusOptions = [
-  { label: 'Draft', value: 'draft' },
-  { label: 'Published', value: 'published' },
-  { label: 'Completed', value: 'completed' }
+  { label: translations.draft, value: 'draft' },
+  { label: translations.published, value: 'published' },
+  { label: translations.completed, value: 'completed' }
 ]
 
 // Table columns
 const columns = [
   {
     key: 'orderNumber',
-    label: 'Order ID'
+    label: translations.orderID
   },
   {
     key: 'distributorName',
-    label: 'Distributor'
+    label: translations.distributorName
   },
   {
     key: 'orderType',
-    label: 'Order Type'
+    label: translations.orderType
   },
   {
     key: 'orderDate',
-    label: 'Date'
+    label: translations.orderDate
   },
   {
     key: 'status',
-    label: 'Status'
+    label: translations.status
   },
   {
     key: 'actions',
@@ -197,11 +199,11 @@ const resetFilters = () => {
 
 const formatOrderType = (type) => {
   switch (type) {
-    case 'regular': return 'Regular'
-    case 'oot': return 'OOT'
-    case 'prekursor': return 'Prekursor'
-    case 'psikotropika': return 'Psikotropika'
-    case 'narkotika': return 'Narkotika'
+    case 'regular': return translations.regular
+    case 'oot': return translations.oot
+    case 'prekursor': return translations.prekursor
+    case 'psikotropika': return translations.psikotropika
+    case 'narkotika': return translations.narkotika
     default: return type
   }
 }
@@ -219,9 +221,9 @@ const getOrderTypeColor = (type) => {
 
 const formatStatus = (status) => {
   switch (status) {
-    case 'draft': return 'Draft'
-    case 'published': return 'Published'
-    case 'completed': return 'Completed'
+    case 'draft': return translations.draft
+    case 'published': return translations.published
+    case 'completed': return translations.completed
     default: return status
   }
 }
@@ -292,11 +294,10 @@ const getActionItems = (row) => {
   const items = [
     [
       {
-        label: 'View Details',
+        label: translations.view,
         icon: 'i-heroicons-eye',
         click: () => handleView(row)
       }
-      // Export PDF option removed
     ]
   ]
   
@@ -304,12 +305,12 @@ const getActionItems = (row) => {
   if (row.status === 'draft') {
     items[0].push(
       {
-        label: 'Edit',
+        label: translations.edit,
         icon: 'i-heroicons-pencil',
         click: () => handleEdit(row)
       },
       {
-        label: 'Delete',
+        label: translations.delete,
         icon: 'i-heroicons-trash',
         click: () => handleDelete(row)
       }
@@ -319,7 +320,7 @@ const getActionItems = (row) => {
   // Add complete option only for published orders
   if (row.status === 'published') {
     items[0].push({
-      label: 'Mark as Completed',
+      label: translations.markAsCompleted,
       icon: 'i-heroicons-check-circle',
       click: () => handleComplete(row)
     })

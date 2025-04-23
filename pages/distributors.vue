@@ -3,13 +3,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-semibold">Distributors</h1>
+        <h1 class="text-2xl font-semibold">{{ translations.distributors }}</h1>
         <UButton
           color="black"
           icon="i-heroicons-plus"
           @click="isAddModalOpen = true"
         >
-          Add Distributor
+          {{ translations.createDistributor }}
         </UButton>
       </div>
 
@@ -36,7 +36,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="text-base font-semibold leading-6 text-gray-900">
-                Add New Distributor
+                {{ translations.addNewDistributor }}
               </h3>
               <UButton
                 color="gray"
@@ -49,32 +49,32 @@
 
           <form @submit.prevent="handleSubmit">
             <div class="space-y-4">
-              <UFormGroup label="Distributor Name" required>
-                <UInput v-model="form.name" placeholder="Enter distributor name" />
+              <UFormGroup :label="translations.distributorName" required>
+                <UInput v-model="form.name" :placeholder="translations.enterDistributorName" />
               </UFormGroup>
 
-              <UFormGroup label="Email" required>
+              <UFormGroup :label="translations.email" required>
                 <UInput 
                   v-model="form.email" 
                   type="email"
-                  placeholder="Enter distributor email" 
+                  :placeholder="translations.enterDistributorEmail" 
                 />
               </UFormGroup>
 
-              <UFormGroup label="Phone" required>
+              <UFormGroup :label="translations.distributorPhone" required>
                 <UInput 
                   v-model="form.phone" 
                   type="tel"
-                  placeholder="Enter distributor phone" 
+                  :placeholder="translations.enterDistributorPhone" 
                 />
               </UFormGroup>
 
-              <UFormGroup label="Address" required>
-                <UTextarea v-model="form.address" placeholder="Enter distributor address" />
+              <UFormGroup :label="translations.distributorAddress" required>
+                <UTextarea v-model="form.address" :placeholder="translations.enterDistributorAddress" />
               </UFormGroup>
 
-              <UFormGroup label="PIC Name" required>
-                <UInput v-model="form.contactPerson" placeholder="Enter PIC name" />
+              <UFormGroup :label="translations.picName" required>
+                <UInput v-model="form.contactPerson" :placeholder="translations.enterPicName" />
               </UFormGroup>
             </div>
           </form>
@@ -86,14 +86,14 @@
                 variant="solid"
                 @click="isAddModalOpen = false"
               >
-                Cancel
+                {{ translations.cancel }}
               </UButton>
               <UButton
                 color="black"
                 :loading="submitting"
                 @click="handleSubmit"
               >
-                Add
+                {{ translations.add }}
               </UButton>
             </div>
           </template>
@@ -106,7 +106,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="text-base font-semibold leading-6 text-gray-900">
-                Edit Distributor
+                {{ translations.editDistributor }}
               </h3>
               <UButton
                 color="gray"
@@ -119,32 +119,32 @@
 
           <form @submit.prevent="handleEditSubmit">
             <div class="space-y-4">
-              <UFormGroup label="Distributor Name" required>
-                <UInput v-model="editForm.name" placeholder="Enter distributor name" />
+              <UFormGroup :label="translations.distributorName" required>
+                <UInput v-model="editForm.name" :placeholder="translations.enterDistributorName" />
               </UFormGroup>
 
-              <UFormGroup label="Email" required>
+              <UFormGroup :label="translations.email" required>
                 <UInput 
                   v-model="editForm.email" 
                   type="email"
-                  placeholder="Enter distributor email" 
+                  :placeholder="translations.enterDistributorEmail" 
                 />
               </UFormGroup>
 
-              <UFormGroup label="Phone" required>
+              <UFormGroup :label="translations.distributorPhone" required>
                 <UInput 
                   v-model="editForm.phone" 
                   type="tel"
-                  placeholder="Enter distributor phone" 
+                  :placeholder="translations.enterDistributorPhone" 
                 />
               </UFormGroup>
 
-              <UFormGroup label="Address" required>
-                <UTextarea v-model="editForm.address" placeholder="Enter distributor address" />
+              <UFormGroup :label="translations.distributorAddress" required>
+                <UTextarea v-model="editForm.address" :placeholder="translations.enterDistributorAddress" />
               </UFormGroup>
 
-              <UFormGroup label="PIC Name" required>
-                <UInput v-model="editForm.contactPerson" placeholder="Enter PIC name" />
+              <UFormGroup :label="translations.picName" required>
+                <UInput v-model="editForm.contactPerson" :placeholder="translations.enterPicName" />
               </UFormGroup>
             </div>
           </form>
@@ -156,14 +156,14 @@
                 variant="solid"
                 @click="isEditModalOpen = false"
               >
-                Cancel
+                {{ translations.cancel }}
               </UButton>
               <UButton
                 color="black"
                 :loading="submitting"
                 @click="handleEditSubmit"
               >
-                Save Changes
+                {{ translations.saveChanges }}
               </UButton>
             </div>
           </template>
@@ -179,6 +179,8 @@ definePageMeta({
   middleware: ['auth']
 })
 
+import { translations } from '~/utils/translations'
+
 // Update columns definition
 const columns = [
   {
@@ -187,23 +189,23 @@ const columns = [
   },
   {
     key: 'name',
-    label: 'Distributor Name'
+    label: translations.distributorName
   },
   {
     key: 'email',
-    label: 'Email'
+    label: translations.email
   },
   {
     key: 'phone',
-    label: 'Phone'
+    label: translations.distributorPhone
   },
   {
     key: 'address',
-    label: 'Address'
+    label: translations.distributorAddress
   },
   {
     key: 'contactPerson',
-    label: 'PIC Name'
+    label: translations.picName
   },
   {
     key: 'actions',
@@ -221,7 +223,6 @@ const submitting = ref(false)
 const isAddModalOpen = ref(false)
 
 // Use store's distributors with computed property for numbering
-// Update the distributors computed property with console log
 const distributors = computed(() => {
   console.log('Store distributors:', distributorStore.distributors)
   return distributorStore.distributors.map((dist, index) => ({
@@ -239,14 +240,14 @@ onMounted(async () => {
   } catch (error) {
     console.error('Fetch error:', error)
     toast.add({
-      title: 'Error',
-      description: 'Failed to load distributors',
+      title: translations.error,
+      description: translations.failedToLoadDistributors,
       color: 'red'
     })
   }
 })
 
-// Remove the duplicate form ref and keep only this one with the correct fields
+// Form for adding new distributor
 const form = ref({
   name: '',
   email: '',
@@ -276,8 +277,19 @@ const handleSubmit = async () => {
       address: '',
       contactPerson: ''
     }
+    
+    toast.add({
+      title: translations.success,
+      description: translations.distributorCreatedSuccessfully,
+      color: 'green'
+    })
   } catch (error) {
     console.error('Error creating distributor:', error)
+    toast.add({
+      title: translations.error,
+      description: translations.failedToCreateDistributor,
+      color: 'red'
+    })
   } finally {
     submitting.value = false
   }
@@ -321,18 +333,43 @@ const handleEditSubmit = async () => {
       contactPerson: editForm.value.contactPerson
     })
     isEditModalOpen.value = false
+    
+    toast.add({
+      title: translations.success,
+      description: translations.distributorUpdatedSuccessfully,
+      color: 'green'
+    })
   } catch (error) {
     console.error('Error updating distributor:', error)
+    toast.add({
+      title: translations.error,
+      description: translations.failedToUpdateDistributor,
+      color: 'red'
+    })
   } finally {
     submitting.value = false
   }
 }
 
 const handleDelete = async (row) => {
+  if (!confirm(translations.confirmDeleteDistributor)) {
+    return
+  }
+  
   try {
     await distributorStore.deleteDistributor(row.id)
+    toast.add({
+      title: translations.success,
+      description: translations.distributorDeletedSuccessfully,
+      color: 'green'
+    })
   } catch (error) {
     console.error('Error deleting distributor:', error)
+    toast.add({
+      title: translations.error,
+      description: translations.failedToDeleteDistributor,
+      color: 'red'
+    })
   }
 }
 
@@ -340,12 +377,12 @@ const handleDelete = async (row) => {
 const getActionItems = (row) => [
   [
     {
-      label: 'Edit',
+      label: translations.edit,
       icon: 'i-heroicons-pencil',
       click: () => handleEdit(row)
     },
     {
-      label: 'Delete',
+      label: translations.delete,
       icon: 'i-heroicons-trash',
       click: () => handleDelete(row)
     }

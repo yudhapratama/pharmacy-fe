@@ -3,46 +3,46 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-semibold">Create New Order</h1>
+        <h1 class="text-2xl font-semibold">{{ translations.createNewOrder }}</h1>
         <UButton
           color="gray"
           variant="solid"
           icon="i-heroicons-arrow-left"
           @click="router.push('/orders')"
         >
-          Back to Orders
+          {{ translations.backToOrders }}
         </UButton>
       </div>
 
       <!-- Order Form -->
       <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b">
-          <h2 class="text-lg font-medium">Order Information</h2>
+          <h2 class="text-lg font-medium">{{ translations.orderInformation }}</h2>
         </div>
 
         <div class="p-6">
           <form @submit.prevent="handleSubmit">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <!-- Distributor Selection -->
-              <UFormGroup label="Distributor" required>
+              <UFormGroup :label="translations.distributor" required>
                 <USelect
                   v-model="form.distributorId"
                   :options="distributorOptions"
-                  placeholder="Select distributor"
+                  :placeholder="translations.selectDistributor"
                 />
               </UFormGroup>
 
               <!-- Order Type -->
-              <UFormGroup label="Order Type" required>
+              <UFormGroup :label="translations.orderType" required>
                 <USelect
                   v-model="form.orderType"
                   :options="orderTypeOptions"
-                  placeholder="Select order type"
+                  :placeholder="translations.selectOrderType"
                 />
               </UFormGroup>
 
               <!-- Order Date -->
-              <UFormGroup label="Order Date" required>
+              <UFormGroup :label="translations.orderDate" required>
                 <UInput
                   v-model="form.orderDate"
                   type="date"
@@ -50,11 +50,11 @@
               </UFormGroup>
 
               <!-- Order Status -->
-              <UFormGroup label="Status" required>
+              <UFormGroup :label="translations.status" required>
                 <USelect
                   v-model="form.status"
                   :options="statusOptions"
-                  placeholder="Select status"
+                  :placeholder="translations.selectStatus"
                 />
               </UFormGroup>
             </div>
@@ -62,19 +62,19 @@
             <!-- Order Items -->
             <div class="mb-6">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-medium">Order Items</h3>
+                <h3 class="text-base font-medium">{{ translations.orderItems }}</h3>
                 <UButton
                   color="gray"
                   variant="solid"
                   icon="i-heroicons-plus"
                   @click="addOrderItem"
                 >
-                  Add Item
+                  {{ translations.addItem }}
                 </UButton>
               </div>
 
               <div v-if="form.items.length === 0" class="text-center py-8 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No items added yet. Click "Add Item" to start.</p>
+                <p class="text-gray-500">{{ translations.noItemsAddedYet }}</p>
               </div>
 
               <div v-else class="space-y-4">
@@ -84,7 +84,7 @@
                   class="p-4 border rounded-lg"
                 >
                   <div class="flex justify-between items-start mb-4">
-                    <h4 class="text-sm font-medium">Item #{{ index + 1 }}</h4>
+                    <h4 class="text-sm font-medium">{{ translations.item }} #{{ index + 1 }}</h4>
                     <UButton
                       color="red"
                       variant="ghost"
@@ -96,70 +96,70 @@
 
                   <!-- Regular Order Form -->
                   <div v-if="form.orderType === 'regular'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <UFormGroup label="Drug Name" required>
-                      <UInput v-model="item.name" placeholder="Enter drug name" />
+                    <UFormGroup :label="translations.drugName" required>
+                      <UInput v-model="item.name" :placeholder="translations.enterDrugName" />
                     </UFormGroup>
-                    <UFormGroup label="Quantity" required>
-                      <UInput v-model="item.quantity" type="number" min="1" placeholder="Enter quantity" />
+                    <UFormGroup :label="translations.quantity" required>
+                      <UInput v-model="item.quantity" type="number" min="1" :placeholder="translations.enterQuantity" />
                     </UFormGroup>
-                    <UFormGroup label="Unit" required>
-                      <UInput v-model="item.unit" placeholder="e.g., Box, Strip" />
+                    <UFormGroup :label="translations.unit" required>
+                      <UInput v-model="item.unit" :placeholder="translations.enterUnit" />
                     </UFormGroup>
                   </div>
 
                   <!-- OOT Order Form -->
                   <div v-else-if="form.orderType === 'oot'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormGroup label="Drug Name" required>
-                      <UInput v-model="item.name" placeholder="Enter drug name" />
+                    <UFormGroup :label="translations.drugName" required>
+                      <UInput v-model="item.name" :placeholder="translations.enterDrugName" />
                     </UFormGroup>
-                    <UFormGroup label="Active Ingredient" required>
-                      <UInput v-model="item.activeIngredient" placeholder="Enter active ingredient" />
+                    <UFormGroup :label="translations.activeIngredient" required>
+                      <UInput v-model="item.activeIngredient" :placeholder="translations.enterActiveIngredient" />
                     </UFormGroup>
-                    <UFormGroup label="Form and Strength" required>
-                      <UInput v-model="item.formAndStrength" placeholder="e.g., Tablet 500mg" />
+                    <UFormGroup :label="translations.formAndStrength" required>
+                      <UInput v-model="item.formAndStrength" :placeholder="translations.enterFormAndStrength" />
                     </UFormGroup>
-                    <UFormGroup label="Unit" required>
-                      <UInput v-model="item.unit" placeholder="e.g., Box, Strip" />
+                    <UFormGroup :label="translations.unit" required>
+                      <UInput v-model="item.unit" :placeholder="translations.enterUnit" />
                     </UFormGroup>
-                    <UFormGroup label="Quantity" required>
-                      <UInput v-model="item.quantity" type="number" min="1" placeholder="Enter quantity" />
+                    <UFormGroup :label="translations.quantity" required>
+                      <UInput v-model="item.quantity" type="number" min="1" :placeholder="translations.enterQuantity" />
                     </UFormGroup>
-                    <UFormGroup label="Quantity in Words" required>
-                      <UInput v-model="item.quantityInWords" placeholder="e.g., One hundred" />
+                    <UFormGroup :label="translations.quantityInWords" required>
+                      <UInput v-model="item.quantityInWords" :placeholder="translations.enterQuantityInWords" />
                     </UFormGroup>
-                    <UFormGroup label="Notes" class="md:col-span-2">
-                      <UTextarea v-model="item.notes" placeholder="Additional notes" />
+                    <UFormGroup :label="translations.notes" class="md:col-span-2">
+                      <UTextarea v-model="item.notes" :placeholder="translations.additionalNotes" />
                     </UFormGroup>
                   </div>
 
                   <!-- Prekursor Order Form -->
                   <div v-else-if="form.orderType === 'prekursor'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormGroup label="Drug Name with Precursor" required>
-                      <UInput v-model="item.name" placeholder="Enter drug name" />
+                    <UFormGroup :label="translations.drugNameWithPrecursor" required>
+                      <UInput v-model="item.name" :placeholder="translations.enterDrugName" />
                     </UFormGroup>
-                    <UFormGroup label="Active Precursor Ingredient" required>
-                      <UInput v-model="item.activeIngredient" placeholder="Enter active precursor" />
+                    <UFormGroup :label="translations.activePrecursorIngredient" required>
+                      <UInput v-model="item.activeIngredient" :placeholder="translations.enterActivePrecursor" />
                     </UFormGroup>
-                    <UFormGroup label="Form and Strength" required>
-                      <UInput v-model="item.formAndStrength" placeholder="e.g., Tablet 500mg" />
+                    <UFormGroup :label="translations.formAndStrength" required>
+                      <UInput v-model="item.formAndStrength" :placeholder="translations.enterFormAndStrength" />
                     </UFormGroup>
-                    <UFormGroup label="Unit" required>
-                      <UInput v-model="item.unit" placeholder="e.g., Box, Strip" />
+                    <UFormGroup :label="translations.unit" required>
+                      <UInput v-model="item.unit" :placeholder="translations.enterUnit" />
                     </UFormGroup>
-                    <UFormGroup label="Quantity" required>
-                      <UInput v-model="item.quantity" type="number" min="1" placeholder="Enter quantity" />
+                    <UFormGroup :label="translations.quantity" required>
+                      <UInput v-model="item.quantity" type="number" min="1" :placeholder="translations.enterQuantity" />
                     </UFormGroup>
-                    <UFormGroup label="Quantity in Words" required>
-                      <UInput v-model="item.quantityInWords" placeholder="e.g., One hundred" />
+                    <UFormGroup :label="translations.quantityInWords" required>
+                      <UInput v-model="item.quantityInWords" :placeholder="translations.enterQuantityInWords" />
                     </UFormGroup>
-                    <UFormGroup label="Notes" class="md:col-span-2">
-                      <UTextarea v-model="item.notes" placeholder="Additional notes" />
+                    <UFormGroup :label="translations.notes" class="md:col-span-2">
+                      <UTextarea v-model="item.notes" :placeholder="translations.additionalNotes" />
                     </UFormGroup>
                   </div>
 
                   <!-- Placeholder for other order types -->
                   <div v-else class="text-center py-4">
-                    <p class="text-gray-500">Form for {{ form.orderType }} will be available soon.</p>
+                    <p class="text-gray-500">{{ translations.formForOrderTypeWillBeAvailableSoon.replace('{orderType}', form.orderType) }}</p>
                   </div>
                 </div>
               </div>
@@ -171,14 +171,14 @@
                 variant="solid"
                 @click="router.push('/orders')"
               >
-                Cancel
+                {{ translations.cancel }}
               </UButton>
               <UButton
                 color="black"
                 type="submit"
                 :loading="submitting"
               >
-                Create Order
+                {{ translations.createOrder }}
               </UButton>
             </div>
           </form>
@@ -193,6 +193,8 @@ definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
 })
+
+import { translations } from '~/utils/translations'
 
 const router = useRouter()
 const orderStore = useOrderStore()
@@ -218,16 +220,16 @@ const distributorOptions = computed(() => {
 })
 
 const orderTypeOptions = [
-  { label: 'Regular', value: 'regular' },
-  { label: 'OOT (Obat-Obat Tertentu)', value: 'oot' },
-  { label: 'Prekursor', value: 'prekursor' },
-  { label: 'Psikotropika', value: 'psikotropika', disabled: true },
-  { label: 'Narkotika', value: 'narkotika', disabled: true }
+  { label: translations.regular, value: 'regular' },
+  { label: translations.oot + ' (Obat-Obat Tertentu)', value: 'oot' },
+  { label: translations.prekursor, value: 'prekursor' },
+  { label: translations.psikotropika, value: 'psikotropika', disabled: true },
+  { label: translations.narkotika, value: 'narkotika', disabled: true }
 ]
 
 const statusOptions = [
-  { label: 'Draft', value: 'draft' },
-  { label: 'Published', value: 'published' }
+  { label: translations.draft, value: 'draft' },
+  { label: translations.published, value: 'published' }
 ]
 
 // Methods
@@ -280,8 +282,8 @@ const handleSubmit = async () => {
   if (!validateForm()) {
     toast.add({
       id: 'validation-error',
-      title: 'Validation Error',
-      description: 'Please fill in all required fields',
+      title: translations.validationError,
+      description: translations.fillAllRequiredFields,
       color: 'red',
       timeout: 5000
     })
@@ -310,8 +312,8 @@ const handleSubmit = async () => {
     
     toast.add({
       id: 'order-success',
-      title: 'Success',
-      description: 'Order created successfully',
+      title: translations.success,
+      description: translations.orderCreatedSuccessfully,
       color: 'green',
       timeout: 5000
     })

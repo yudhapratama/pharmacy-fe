@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-slate-50">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-2xl font-semibold mb-8">Profile Management</h1>
+      <h1 class="text-2xl font-semibold mb-8">{{ translations.profileManagement }}</h1>
 
       <div class="flex gap-4 mb-8">
         <UButton
@@ -9,61 +9,61 @@
           to="/profile/pharmacy"
           active
         >
-          Pharmacy Profile
+          {{ translations.pharmacyProfile }}
         </UButton>
         <UButton
           variant="outline"
           to="/profile/account"
         >
-          Account Settings
+          {{ translations.accountSettings }}
         </UButton>
       </div>
 
       <UCard>
         <div class="space-y-8">
           <div>
-            <h2 class="text-xl font-semibold mb-2">Pharmacy Information</h2>
-            <p class="text-slate-600">Update your pharmacy details. This information will be used for orders and invoices.</p>
+            <h2 class="text-xl font-semibold mb-2">{{ translations.pharmacyInformation }}</h2>
+            <p class="text-slate-600">{{ translations.updatePharmacyDetails }}</p>
           </div>
 
           <div>
-            <h3 class="text-lg font-medium mb-4">Person in Charge (PIC)</h3>
+            <h3 class="text-lg font-medium mb-4">{{ translations.personInCharge }}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <UFormGroup label="PIC Name" required>
-                <UInput v-model="form.picName" placeholder="Enter PIC name" />
+              <UFormGroup :label="translations.picName" required>
+                <UInput v-model="form.picName" :placeholder="translations.enterPicName" />
               </UFormGroup>
-              <UFormGroup label="PIC Phone Number" required>
+              <UFormGroup :label="translations.picPhone" required>
                 <UInput v-model="form.picPhone" placeholder="e.g. 08123456789" />
               </UFormGroup>
-              <UFormGroup label="PIC Email" required class="md:col-span-2">
-                <UInput v-model="form.picEmail" type="email" placeholder="Enter PIC email" />
+              <UFormGroup :label="translations.picEmail" required class="md:col-span-2">
+                <UInput v-model="form.picEmail" type="email" :placeholder="translations.enterPicEmail" />
               </UFormGroup>
             </div>
           </div>
 
           <div>
-            <h3 class="text-lg font-medium mb-4">Pharmacy Details</h3>
+            <h3 class="text-lg font-medium mb-4">{{ translations.pharmacyDetails }}</h3>
             <div class="grid grid-cols-1 gap-6">
-              <UFormGroup label="Pharmacy Name" required>
-                <UInput v-model="form.pharmacyName" placeholder="Enter pharmacy name" />
+              <UFormGroup :label="translations.pharmacyName" required>
+                <UInput v-model="form.pharmacyName" :placeholder="translations.enterPharmacyName" />
               </UFormGroup>
-              <UFormGroup label="Pharmacy Address" required>
-                <UTextarea v-model="form.pharmacyAddress" placeholder="Enter pharmacy address" />
+              <UFormGroup :label="translations.pharmacyAddress" required>
+                <UTextarea v-model="form.pharmacyAddress" :placeholder="translations.enterPharmacyAddress" />
               </UFormGroup>
             </div>
           </div>
 
           <div>
-            <h3 class="text-lg font-medium mb-4">License Information</h3>
+            <h3 class="text-lg font-medium mb-4">{{ translations.licenseInformation }}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <UFormGroup label="Pharmacist Name" required>
-                <UInput v-model="form.pharmacistName" placeholder="Enter pharmacist name" />
+              <UFormGroup :label="translations.pharmacistName" required>
+                <UInput v-model="form.pharmacistName" :placeholder="translations.enterPharmacistName" />
               </UFormGroup>
               <UFormGroup label="SIPA" required>
-                <UInput v-model="form.sipa" placeholder="Enter SIPA number" />
+                <UInput v-model="form.sipa" :placeholder="translations.enterSipaNumber" />
               </UFormGroup>
-              <UFormGroup label="SIA" required>
-                <UInput v-model="form.sia" placeholder="Enter SIA number" />
+              <UFormGroup :label="translations.siaNumber" required>
+                <UInput v-model="form.sia" :placeholder="translations.enterSiaNumber" />
               </UFormGroup>
             </div>
           </div>
@@ -75,7 +75,7 @@
               :disabled="saving"
               @click="saveChanges"
             >
-              {{ saving ? 'Saving...' : 'Save Changes' }}
+              {{ saving ? translations.saving : translations.saveChanges }}
             </UButton>
           </div>
         </div>
@@ -89,6 +89,8 @@ definePageMeta({
   layout: 'authenticated',
   middleware: ['auth']
 })
+
+import { translations } from '~/utils/translations'
 
 const profileStore = useProfileStore()
 const toast = useToast()
@@ -124,15 +126,15 @@ const saveChanges = async () => {
     console.log('Saving profile data:', form.value)
     await profileStore.updateProfile(form.value)
     toast.add({
-      title: 'Success',
-      description: 'Profile updated successfully',
+      title: translations.success,
+      description: translations.profileUpdatedSuccessfully,
       color: 'green'
     })
   } catch (error) {
     console.error('Profile update error:', error)
     toast.add({
-      title: 'Error',
-      description: error.message || 'Failed to update profile',
+      title: translations.error,
+      description: error.message || translations.failedToUpdateProfile,
       color: 'red'
     })
   } finally {

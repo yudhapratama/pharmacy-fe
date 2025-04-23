@@ -4,8 +4,8 @@
       <!-- Login Form Section -->
       <div class="bg-white rounded-3xl p-8 shadow-sm">
         <div class="space-y-2 mb-8 text-center">
-          <h1 class="text-4xl font-medium text-slate-900">Welcome back</h1>
-          <p class="text-base text-slate-500">Enter your credentials to access your account</p>
+          <h1 class="text-4xl font-medium text-slate-900">{{ translations.welcomeBack }}</h1>
+          <p class="text-base text-slate-500">{{ translations.enterCredentials }}</p>
         </div>
 
         <UForm 
@@ -16,11 +16,11 @@
         >
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <label class="text-sm font-medium text-slate-700">Email</label>
+              <label class="text-sm font-medium text-slate-700">{{ translations.email }}</label>
             </div>
             <UInput
               v-model="form.email"
-              placeholder="you@example.com"
+              placeholder="anda@contoh.com"
               type="email"
               class="h-14"
               :ui="{
@@ -32,7 +32,7 @@
 
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <label class="text-sm font-medium text-slate-700">Password</label>
+              <label class="text-sm font-medium text-slate-700">{{ translations.password }}</label>
             </div>
             <UInput
               v-model="form.password"
@@ -57,7 +57,7 @@
             class="h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium"
             :loading="isLoading"
           >
-            Sign In
+            {{ translations.login }}
           </UButton>
         </UForm>
       </div>
@@ -69,14 +69,12 @@
             {{ $config.public.appName }}
           </h2>
           <p class="text-slate-500">
-            A streamlined solution for pharmacies to manage medication orders from distributors efficiently.
+            Solusi efisien untuk apotek dalam mengelola pesanan obat dari distributor.
           </p>
         </div>
 
         <div class="space-y-1 text-sm">
-          <p class="text-slate-500">For demo purposes, use:</p>
-          <p class="font-mono">Email: <span class="text-slate-900">admin@example.com</span></p>
-          <p class="font-mono">Password: <span class="text-slate-900">Password123!</span></p>
+          <p class="text-slate-500">Silakan hubungi administrator untuk mendapatkan akses login.</p>
         </div>
       </div>
     </div>
@@ -88,6 +86,8 @@ definePageMeta({
   layout: 'default',
   middleware: ['auth']
 })
+import { translations } from '~/utils/translations'
+
 const authStore = useAuthStore()
 const router = useRouter()
 
@@ -101,12 +101,12 @@ const isLoading = ref(false)
 
 const rules = {
   email: [
-    { required: true, message: 'Email is required' },
-    { type: 'email', message: 'Please enter a valid email address' }
+    { required: true, message: 'Email wajib diisi' },
+    { type: 'email', message: 'Silakan masukkan alamat email yang valid' }
   ],
   password: [
-    { required: true, message: 'Password is required' },
-    { min: 8, message: 'Password must be at least 8 characters' }
+    { required: true, message: 'Kata sandi wajib diisi' },
+    { min: 8, message: 'Kata sandi minimal 8 karakter' }
   ]
 }
 
@@ -119,7 +119,7 @@ const handleLogin = async () => {
     router.push('/dashboard')
   } catch (error) {
     errors.value = {
-      form: error?.message || 'Invalid credentials'
+      form: error?.message || 'Kredensial tidak valid'
     }
   } finally {
     isLoading.value = false

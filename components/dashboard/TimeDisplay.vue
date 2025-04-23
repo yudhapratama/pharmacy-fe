@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-1">
-    <h2 class="text-2xl font-semibold">Dashboard</h2>
+    <h2 class="text-2xl font-semibold">{{ translations.dashboard }}</h2>
     <div class="text-slate-500">
-      Current Time
+      {{ translations.currentTime }}
       <p class="text-xl font-medium text-slate-900">{{ formattedTime }}</p>
     </div>
   </div>

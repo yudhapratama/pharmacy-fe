@@ -9,32 +9,32 @@
           icon="i-heroicons-plus"
           @click="router.push('/orders/create')"
         >
-          Create Order
+          {{ translations.createOrder }}
         </UButton>
       </div>
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <DashboardStatsCard
-          title="Total Orders"
+          :title="translations.totalOrders"
           :value="orderStats.total.toString()"
           icon="i-heroicons-shopping-cart"
           bgColor="bg-blue-500"
         />
         <DashboardStatsCard
-          title="Processed Orders"
+          :title="translations.processedOrders"
           :value="orderStats.pending.toString()"
           icon="i-heroicons-clock"
           bgColor="bg-orange-500"
         />
         <DashboardStatsCard
-          title="Completed Orders"
+          :title="translations.completedOrders"
           :value="orderStats.completed.toString()"
           icon="i-heroicons-check-circle"
           bgColor="bg-green-500"
         />
         <DashboardStatsCard
-          title="Total Distributors"
+          :title="translations.totalDistributors"
           :value="distributorCount"
           icon="i-heroicons-building-storefront"
           bgColor="bg-purple-500"
@@ -45,6 +45,7 @@
       <DashboardRecentOrders
         :orders="recentOrders"
         :loading="loadingOrders"
+        :title="translations.recentOrders"
       />
     </div>
   </div>
@@ -56,6 +57,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useDistributorStore } from '~/stores/distributor'
 import { useOrderStore } from '~/stores/order'
+import { translations } from '~/utils/translations'
 
 definePageMeta({
   layout: 'authenticated',

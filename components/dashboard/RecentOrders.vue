@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-lg font-medium">Recent Orders</h2>
+      <h2 class="text-lg font-medium">{{ title }}</h2>
     </div>
     
     <div v-if="loading" class="flex justify-center items-center py-12">
@@ -9,7 +9,7 @@
     </div>
     
     <div v-else-if="orders.length === 0" class="p-6 text-center text-gray-500">
-      No orders found
+      {{ translations.noOrdersFound }}
     </div>
     
     <div v-else class="overflow-x-auto">
@@ -17,19 +17,19 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Order ID
+              {{ translations.orderID }}
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Item
+              {{ translations.item }}
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Quantity
+              {{ translations.quantity }}
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+              {{ translations.status }}
             </th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
+              {{ translations.actions }}
             </th>
           </tr>
         </thead>
@@ -69,13 +69,15 @@
         variant="ghost"
         @click="$router.push('/orders')"
       >
-        View All Orders
+        {{ translations.viewAllOrders }}
       </UButton>
     </div>
   </div>
 </template>
 
 <script setup>
+import { translations } from '~/utils/translations'
+
 defineProps({
   orders: {
     type: Array,
@@ -84,6 +86,10 @@ defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  title: {
+    type: String,
+    default: translations.recentOrders
   }
 })
 
